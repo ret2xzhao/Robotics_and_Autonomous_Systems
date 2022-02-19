@@ -127,7 +127,7 @@ def calibrateCameraFromVideo(vidPath, squareSizeMeters, resizePercent=100, camer
                 "error": mean_error/len(objpoints),
                 "resize": resizePercent}
 
-    fileName = str(cameraName) + "_cam_cal_data_"+ str(resizePercent) + "percent"
+    fileName = str(cameraName) + "_cam_cal_data_"+ str(resizePercent) + "_percent"
     cv.imwrite(folderpath + fileName + ".png", dst)
     save_camera_data(folderpath, fileName, fileDict)
     print("Complete, saved to: " + folderpath + fileName)
