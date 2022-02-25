@@ -1,0 +1,6 @@
+-udev Rules for Permanent Camera Assignment:
+     Add rules:
+         cd /etc/udev/rules.d
+         sudo nano 90-name-video-devices.rules
+         Example:
+         ACTION=="add", SUBSYSTEM=="video4linux", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0825", ATTR{index}=="0", SYMLINK+="myusb"
