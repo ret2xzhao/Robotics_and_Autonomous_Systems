@@ -1,3 +1,38 @@
+uevent:
+    -every directory under /sys/devices that contains a file called "uevent" represents a device. This file can be written in order to synthesize "ADD" events, "REMOVE" events,
+     or other events that can be processed by udev. It can be read to show context information that accompanies those events.
+
+udev (userspace /dev):
+    -is a device manager for the Linux kernel. As the successor of devfsd and hotplug, udev primarily manages device nodes in the /dev directory.
+    -What are udev rules? It allows you to identify devices based on their properties, like vendor ID and device ID, dynamically. udev runs in userspace
+     (as opposed to devfs which was executed in kernel space). udev allows for rules that specify what name is given to a device, regardless of which port it is plugged into.
+
+udev 规则的匹配键:
+    ACTION：事件(uevent)的行为，例如：add(添加设备)、remove(删除设备)。
+
+    KERNEL：内核设备名称，例如：sda, cdrom。
+
+    DEVPATH：设备的devpath路径。
+
+    SUBSYSTEM：设备的子系统名称，例如：sda的子系统为block。
+
+    BUS：设备在devpath里的总线名称，例如：usb。
+
+    DRIVER：设备在devpath里的设备驱动名称，例如：ide-cdrom。
+
+    ID：设备在devpath里的识别号。
+
+    SYSFS{filename}：设备的devpath路径下，设备的属性文件"filename"里的内容。
+    例如：SYSFS{model}=="ST936701SS"表示：如果设备的型号为ST936701SS，则该设备匹配该匹配键。
+    在一条规则中，可以设定最多五条SYSFS的匹配键。
+
+    ENV{key}：环境变量。在一条规则中，可以设定最多五条环境变量的匹配键。
+
+    PROGRAM：调用外部命令。
+    RESULT：外部命令PROGRAM的返回结果。例如：
+    PROGRAM=="/lib/udev/scsi_id -g -s $devpath", RESULT=="35000c50000a7ef67"
+    调用外部命令/lib/udev/scsi_id查询设备的SCSI ID，如果返回结果为35000c50000a7ef67，则该设备匹配该匹配键。
+
 -udev Rules for Permanent Camera Assignment:
      Add rules:
          cd /etc/udev/rules.d
