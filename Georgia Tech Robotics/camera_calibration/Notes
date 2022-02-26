@@ -39,3 +39,9 @@ udev 规则的匹配键:
          sudo nano 90-name-video-devices.rules
          Example:
          ACTION=="add", SUBSYSTEM=="video4linux", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0825", ATTR{index}=="0", SYMLINK+="myusb"
+
+     Reboot linux usb-rules:
+         sudo udevadm control --reload-rules && udevadm trigger
+     To confirm:
+         ls -ltrh /dev/video*
+         ls -l /dev/video* /dev/myusb
