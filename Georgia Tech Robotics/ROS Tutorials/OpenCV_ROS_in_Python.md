@@ -205,7 +205,7 @@ The next node will subscribe to the `image` topic and execute a series of proces
 
     * Note that we don't have to edit `CMakeLists` to create new build rules for each script, since Python does not need to be compiled.
 
- 1. Add a ROS subscriber to the `image` topic, to provide the source for images to process.
+ 2. Add a ROS subscriber to the `image` topic, to provide the source for images to process.
 
     1. Import the `Image` message header
 
@@ -213,7 +213,7 @@ The next node will subscribe to the `image` topic and execute a series of proces
        from sensor_msgs.msg import Image
        ```
 
-    1. Above the `start_node` function, create an empty callback (`process_image`) that will be called when a new Image message is received:
+    2. Above the `start_node` function, create an empty callback (`process_image`) that will be called when a new Image message is received:
 
        ```python
        def process_image(msg):
@@ -224,7 +224,7 @@ The next node will subscribe to the `image` topic and execute a series of proces
        ```
        * The try/except error handling will allow our code to continue running, even if there are errors during the processing pipeline.
 
-    1. In the `start_node` function, create a ROS Subscriber object:
+    3. In the `start_node` function, create a ROS Subscriber object:
        * subscribe to the `image` topic, monitoring messages of type `Image`
        * register the callback function we defined above
 
@@ -236,7 +236,7 @@ The next node will subscribe to the `image` topic and execute a series of proces
        * reference: [rospy.Subscriber](http://docs.ros.org/melodic/api/rospy/html/rospy.topics.Subscriber-class.html)
        * reference: [rospy.spin](http://docs.ros.org/melodic/api/rospy/html/rospy-module.html#spin)
 
-    1. Run the new node and verify that it is subscribing to the topic as expected:
+    4. Run the new node and verify that it is subscribing to the topic as expected:
 
        ```bash
        rosrun detect_pump detect_pump.py
@@ -244,8 +244,8 @@ The next node will subscribe to the `image` topic and execute a series of proces
        rqt_graph
        ```
 
- 1. Convert the incoming `Image` message to an OpenCV `Image` object and display it
- As before, we'll use the `CvBridge` module to do the conversion.
+ 3. Convert the incoming `Image` message to an OpenCV `Image` object and display it
+ as before, we'll use the `CvBridge` module to do the conversion.
 
     1. Import the `CvBridge` modules:
 
@@ -253,7 +253,7 @@ The next node will subscribe to the `image` topic and execute a series of proces
        from cv_bridge import CvBridge
        ```
 
-    1. In the `process_image` callback, add a call to the CvBridge [imgmsg_to_cv2](https://docs.ros.org/api/cv_bridge/html/python/) method:
+    2. In the `process_image` callback, add a call to the CvBridge [imgmsg_to_cv2](https://docs.ros.org/api/cv_bridge/html/python/) method:
 
        ```python
        # convert sensor_msgs/Image to OpenCV Image
@@ -261,9 +261,9 @@ The next node will subscribe to the `image` topic and execute a series of proces
        orig = bridge.imgmsg_to_cv2(msg, "bgr8")
        ```
        * This code (and all other image-processing code) should go inside the `try` block, to ensure that processing errors don't crash the node.
-       * This should replace the placeholder `pass` command placed in the `try` block earlier
+       * This should replace the placeholder `pass` command placed in the `try` block earlier.
 
-    1. Use the OpenCV `imshow` method to display the images received.  We'll create a pattern that can be re-used to show the result of each image-processing step.
+    3. Use the OpenCV `imshow` method to display the images received.  We'll create a pattern that can be re-used to show the result of each image-processing step.
 
        1. Import the OpenCV `cv2` module:
 
@@ -271,7 +271,7 @@ The next node will subscribe to the `image` topic and execute a series of proces
           import cv2
           ```
 
-       1. Add a display helper function above the `process_image` callback:
+       2. Add a display helper function above the `process_image` callback:
 
           ```python
           def showImage(img):
@@ -279,22 +279,22 @@ The next node will subscribe to the `image` topic and execute a series of proces
               cv2.waitKey(1)
           ```
 
-       1. Copy the received image to a new "drawImg" variable:
+       3. Copy the received image to a new "drawImg" variable:
 
           ```python
           drawImg = orig
           ```
 
-       1. **Below** the `except` block (outside its scope; at `process_image` scope, display the `drawImg` variable:
+       4. **Below** the `except` block (outside its scope; at `process_image` scope, display the `drawImg` variable:
 
           ```python
           # show results
           showImage(drawImg)
           ```
 
-    1. Run the node and see the received image displayed.
+    4. Run the node and see the received image displayed.
 
- 1. The first step in the image-processing pipeline is to resize the image, to speed up future processing steps.  Add the following code inside the `try` block, then rerun the node.
+ 4. The first step in the image-processing pipeline is to resize the image, to speed up future processing steps.  Add the following code inside the `try` block, then rerun the node.
 
     ```python
     # resize image (half-size) for easier processing
@@ -304,7 +304,7 @@ The next node will subscribe to the `image` topic and execute a series of proces
     * you should see a smaller image being displayed
     * reference: [resize()](https://docs.opencv.org/3.0-beta/modules/imgproc/doc/geometric_transformations.html#resize)
 
- 1. Next, convert the image from color to grayscale.  Run the node to check for errors, but the image will still look the same as previously.
+ 5. Next, convert the image from color to grayscale.  Run the node to check for errors, but the image will still look the same as previously.
 
     ```python
     # convert to single-channel image
@@ -316,7 +316,7 @@ The next node will subscribe to the `image` topic and execute a series of proces
     * We convert back to a color image for `drawImg` so that we can draw colored overlays on top of the image to display the results of later processing steps.
     * reference: [cvtColor()](https://docs.opencv.org/3.0-beta/modules/imgproc/doc/miscellaneous_transformations.html#cvtcolor)
 
- 1. Apply a thresholding operation to turn the grayscale image into a binary image.  Run the node and see the thresholded image.
+ 6. Apply a thresholding operation to turn the grayscale image into a binary image.  Run the node and see the thresholded image.
 
     ```python
     # threshold grayscale to binary (black & white) image
@@ -328,8 +328,9 @@ The next node will subscribe to the `image` topic and execute a series of proces
     You should experiment with the `threshVal` paramter to find a value that works best for this image.  Valid values for this parameter lie between [0-255], to match the grayscale pixel intensity range.  Find a value that clearly highlights the pump face geometry.  I found that a value of `150` seemed good to me.
 
     * reference [threshold](https://docs.opencv.org/3.0-beta/modules/imgproc/doc/miscellaneous_transformations.html#threshold)
+    #
 
- 1. Detect the outer pump-housing circle.
+ 7. Detect the outer pump-housing circle.
 
      This is not actually used to detect the pump angle, but serves as a good example of feature detection.  In a more complex scene, you could use OpenCV's Region Of Interest (ROI) feature to limit further processing to only features inside this pump housing circle.
 
